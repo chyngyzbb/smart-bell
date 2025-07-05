@@ -6,7 +6,7 @@ import { RiAlarmWarningFill } from "react-icons/ri";
 import { setLocal } from "../../store/slice/smartSlice";
 import SettingsMuz from "../SettingsMuz/SettingsMuz";
 import { MdEdit } from "react-icons/md";
-import { muzOnePlay, muzTwoPlay } from "../../store/slice/muzSlice";
+import { muzAllStop, muzOnePlay, muzTwoPlay } from "../../store/slice/muzSlice";
 import './ListOne.css'
 
 const style = {
@@ -59,7 +59,14 @@ function ListOne() {
     setCounter(e);
     setOpenTwo(true);
   };
-  const handleCloseTwo = () => setOpenTwo(false);
+  const handleCloseTwo = () =>{
+    dispatch(muzOnePlay())
+    dispatch(muzTwoPlay())
+         setOpenTwo(false);
+// setTimeout(()=>{
+    dispatch(muzAllStop())
+// },100)
+  }
 
 
   //  Маалыматты localStorage ге сактоо жана өзгөртүү функциялары

@@ -16,9 +16,11 @@ import {
 } from "../../store/slice/smartSlice";
 import Header from "../../component/Header/Header";
 import Footer from "../../component/Footer/Footer";
-import { muzOnePlay, muzTwoPlay } from "../../store/slice/muzSlice";
+import { muzAllStop, muzOnePlay, muzTwoPlay } from "../../store/slice/muzSlice";
 import ListOne from "../../component/ListOne/ListOne";
 import ListTwo from "../../component/ListTwo/ListTwo";
+import komuz from "../../assets/muz/komuz-kyrgyzstan--zhay-leto.mp3";
+import komuz2 from "../../assets/muz/sarynzhy-bokoy-komuz-sarynzhy-bokoy-komuz.mp3";
 
 function SmartBell() {
   const dispatch = useDispatch();
@@ -33,6 +35,8 @@ function SmartBell() {
   const audioRef = useRef(null);
   const [audioSrcTwo, setAudioSrcTwo] = useState(null);
   const audioRefTwo = useRef(null);
+  const audio = useRef(new Audio(komuz));
+  const audio2 = useRef(new Audio(komuz2));
 
   const StartSmartObj = [
     {
@@ -145,6 +149,7 @@ function SmartBell() {
 
   // Коңгуроону иштетүү функциялары
   function startSystem(e) {
+    dispatch(muzAllStop())
     setSystems(e);
     setStarted(e);
     audioRef.current?.play();
@@ -152,11 +157,18 @@ function SmartBell() {
     audioRef.current?.pause();
     audioRefTwo.current?.pause();
   }
+
+  console.log("started: ", started);
+  console.log("system: ", systems);
+
   //   Коңгуроону токтотуу
   useEffect(() => {
     if (muzPause) {
       audioRef.current?.pause();
       audioRefTwo.current?.pause();
+      audio.current.pause();
+      audio2.current.pause();
+
       // setStarted(false);
       // oneMin();
     }
@@ -169,6 +181,7 @@ function SmartBell() {
   }
   // Убакытты текшүү
   useEffect(() => {
+    if (!systems) return;
     if (!started) return;
     const interval = setInterval(() => {
       const h = new Date().getHours();
@@ -227,11 +240,12 @@ function SmartBell() {
     if (savedAudioTwo) {
       setAudioSrcTwo(savedAudioTwo);
     }
-  }, []);
+  }, [muzOne, muzTwo, muzPause]);
 
   useEffect(() => {
+    if(!systems) return
     if (muzOne) {
-      if (audioRef.current) {
+      if (audioSrc !== null) {
         audioRef.current?.pause();
         audioRefTwo.current?.pause();
         audioRef.current.currentTime = 0;
@@ -241,14 +255,25 @@ function SmartBell() {
           audioRef.current?.pause();
           oneMin();
         }, number);
+      } else {
+        audio.current.currentTime = 0;
+        audio.current.play();
+        console.log("no 1");
+        setStarted(false);
+        setTimeout(() => {
+          audio.current.pause();
+          oneMin();
+        }, number);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [muzOne, muzPause, muzTwo]);
 
   useEffect(() => {
+    if(!systems) return
     if (muzTwo) {
-      if (audioRefTwo.current) {
+      // if (audioRefTwo.current) {
+      if (audioSrcTwo !== null) {
         audioRef.current?.pause();
         audioRefTwo.current?.pause();
         audioRefTwo.current.currentTime = 0;
@@ -258,16 +283,28 @@ function SmartBell() {
           audioRefTwo.current?.pause();
           oneMin();
         }, number);
+      } else {
+        audio2.current.currentTime = 0;
+        audio2.current.play();
+        console.log("no 2");
+        setStarted(false);
+        setTimeout(() => {
+          audio2.current.pause();
+          oneMin();
+        }, number);
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [muzTwo, muzPause, muzOne]);
+  // console.log(muzOne,muzTwo);
+  // console.log(audioRefTwo.current.src);
+  // console.log(audioRef.current.src);
 
   useEffect(() => {
     setSmartState(smart);
     setSmartStateTwo(smartTwo);
   }, [dispatch, smart, smartTwo]);
-  console.log(systems);
+  // console.log(systems);
 
   if (loading)
     return (
@@ -313,6 +350,7 @@ function SmartBell() {
           label="Күйгүзүү"
         />
         <Footer />
+        
       </div>
     </>
   );
