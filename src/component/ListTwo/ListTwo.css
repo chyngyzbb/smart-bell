@@ -1,0 +1,11 @@
+.list-two{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    .list-two-title{
+        padding-bottom: 6px;
+        padding-top: 12px;
+        font-size: 15px;
+    }
+}
